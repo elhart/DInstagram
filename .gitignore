@@ -6,5 +6,10 @@ tmp
 .history
 dist
 .project
+.DS_Store
+.hg
+.settings
+bin
+test
 
 *.prefs
