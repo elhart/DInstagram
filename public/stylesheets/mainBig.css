@@ -1,0 +1,387 @@
+/* DInstagram App 1320x1080 */
+
+@font-face {
+	font-family: instagram;
+	src: url('Billabong.ttf');
+}
+
+html, body {
+    padding: 0;
+   	margin: 0;
+	background-color: #787878;
+	overflow: hidden;
+}
+
+body {
+	background-color: black;
+	width: 1320px;
+	height: 1080px;
+}
+
+/* logo */
+#logoBox {
+	width: 100%;
+	height: 100px;
+}
+
+#logo{
+	position: relative;
+	font-family: instagram;
+	color: #379;
+	font-size: 90px;
+	left: 23%;
+	top: 5%;
+}
+
+#logoTag{
+	position: absolute;
+	color: #379;
+	font-size: 40px;
+	top: 20px;
+	left: 670px;
+}
+
+/* pages */
+#pageFrame{
+	height: 930px;
+	width: 1050px;
+	overflow: hidden;
+	
+}
+
+#pageBox{
+	position: relative;
+	height: 930px;
+	width: 3200px;
+	left: 5px;
+}
+
+.page{
+	position: relative;
+	height: 930px;
+	width: 1040px;
+	float: left;
+	color: #379;
+	/*border-style:solid;
+	border-color:gray;*/
+}
+
+#pageIndicatorBox{
+	height: 50px;
+	width: 1050px;
+}
+
+#pageIndicatorBoxInner{
+	position: relative;
+	height: 50px;
+	width: 120px;
+	top: 10%;
+	left: 45%;
+}
+
+.pageIndicator{
+	float: left;
+	margin: 10px;
+	width:20px;
+	height:20px;
+	border-radius:10px;	
+	background:#ffffff;
+}
+
+.pageIndicatorOff{
+	float: left;
+	margin: 10px;
+	width:20px;
+	height:20px;
+	border-radius:10px;	
+	background:gray;
+}
+
+/* hot/top images */
+
+#hotLogo{
+	position: absolute;
+	height: 50px;
+	top: 40px;
+	width: 200px;
+	left: 1130px;
+	font-family:instagram;
+	color: #379;
+	font-size: 50px;
+}
+
+#hotFrame{
+	position: absolute;
+	height: 953px;
+	width: 270px;
+	top: 101px;
+	left: 1042px;
+	overflow: hidden;
+	border-left:solid;
+	border-left-color:#379;
+	border-left-width: 12px;
+	
+}
+
+/* items/images */
+.item {
+	position: absolute;
+	background-color: gray;
+	width: 250px;
+	height: 225px;
+	
+}
+
+.image {
+	width: 225px;
+	height: 225px;
+}
+
+.it0{
+	top: 0px;
+	left: 0px;
+}
+.it1{
+	top: 0px;
+	left: 255px;
+}
+.it2{
+	top: 0px;
+	left: 510px;
+}
+.it3{
+	top: 0px;
+	left: 765px;
+}
+.it4{
+	top: 235px;
+	left: 0px;
+}
+.it5{
+	top: 235px;
+	left: 255px;
+}
+.it6{
+	top: 235px;
+	left: 510px;
+}
+.it7{
+	top: 235px;
+	left: 765px;
+}
+.it8{
+	top: 470px;
+	left: 0px;
+}
+.it9{
+	top: 470px;
+	left: 255px;
+}
+.it10{
+	top: 470px;
+	left: 510px;
+}
+.it11{
+	top: 470px;
+	left: 765px;
+}
+.it12{
+	top: 705px;
+	left: 0px;
+}
+.it13{
+	top: 705px;
+	left: 255px;
+}
+.it14{
+	top: 705px;
+	left: 510px;
+}
+.it15{
+	top: 705px;
+	left: 765px;
+}
+
+.imageUserPic{
+	position: absolute;
+	width: 25px;
+	height: 25px;
+	top: 0px;
+	left: 225px;
+}
+
+.imageUserName{
+	position: absolute;
+	width: 160px;
+	height: 25px;
+	top: 100px;
+	left: 155px;
+	writing-mode: tb-rl;
+	font-family:instagram;
+	color: black;
+	font-size: 20px;
+	-webkit-transform: rotate(90deg);
+	
+}
+
+.imageHeartImg{
+	position: absolute;
+	width: 20px;
+	height: 20px;
+	top: 185px;
+	left: 228px;
+}
+
+.imageNLikes{
+	position: absolute;
+	width: 25px;
+	height: 20px;
+	top: 207px;
+	left: 225px;
+	font-family:instagram;
+	color: black;
+	font-size: 15px;
+	text-align: center;
+}
+
+#imageNewRibbon{ 
+	position: relative;
+	width: 0; 
+	height: 0; 
+	border-top: 100px solid red; 
+	border-right: 100px solid transparent;
+	display: none;
+}
+
+#imageNewRibbonText{ 
+	position: absolute;
+	top: -90px;
+	left: 5px;
+	font-size: 32px;
+	color: white;
+	font-family: instagram;
+}
+/* image gallery, on image click() */
+#imageGallery{
+	position: absolute;
+	top: 125px;
+	left: 100px;
+	width: 1130px;
+	height: 880px;
+	background: rgba(190, 190, 190, 0.9);
+	display: none;	
+	border: solid;
+	border-radius: 10px;
+}
+
+#imageGalleryBox{
+	position: relative;
+	width: 612px;
+	height: 612px;
+	left: 230px;
+	top: 174px;
+	float:left;
+	border: solid;
+}
+
+#imageGalleryX{
+	position: absolute;
+	width: 70px;
+	height: 70px;
+	top: -5px;
+	left: 1053px;
+	border: solid;
+	border-radius: 10px;
+	font-family:instagram;
+	color: black;
+	font-size: 70px;
+	text-align: center;
+}
+
+#imageGallerySBar{
+	position: relative;
+	width: 80px;
+	height: 615px;
+	left: 854px;
+	top: 177px;
+	border-radius: 10px;
+	background-image: -webkit-gradient(
+          linear, left top, right bottom, 
+          from(rgba(190, 190, 190, 1.0)),
+          to(rgba(190, 190, 190, 0.1))
+    );
+	
+}
+
+#imageGallerySBarHeart{
+	position: absolute;
+	width: 55px;
+	height: 55px;
+	left: 10px;
+	top: 20px;
+}
+
+#imageGallerySBarNLikes{
+	position: absolute;
+	width: 80px;
+	height: 80px;
+	top: 81px;
+	left: 0px;
+	font-family: instagram;
+	color: black;
+	font-size: 40px;
+	margin-top: 0px;
+	text-align: center;
+}
+
+#imageGalleryABar{
+	position: absolute;
+	width: 700px;
+	height: 80px;
+	top : 90px;
+	left: 230px;
+	border-radius: 10px;
+	background-image: -webkit-gradient(
+          linear, left top, right top, 
+          from(rgba(190, 190, 190, 1.0)),
+          to(rgba(190, 190, 190, 0.1))
+    );
+    
+}
+
+#imageGalleryABarUPic{
+	position: absolute;
+	width: 80px;
+	height: 80px;
+	top: 0px;
+	left: 0px;
+	border-radius: 10px;
+}
+
+#imageGalleryABarUName{
+	position: absolute;
+	width: 370px;
+	height: 80px;
+	top: 0px;
+	left: 80px;
+	font-family:instagram;
+	color: black;
+	font-size: 50px;
+	margin-top: 15px;
+	padding-left: 40px;
+}
+
+#imageGalleryABarTime{
+	position: absolute;
+	width: 220px;
+	top: 0px;
+	left: 400px;
+	font-family:instagram;
+	color: black;
+	font-size: 30px;
+	margin-top: 30px;
+	text-align: right;
+	
+}
+
+

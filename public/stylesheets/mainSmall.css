@@ -1,0 +1,24 @@
+/* HelloWorld Display App 600x1080 */
+
+html, body {
+    padding: 0;
+   	margin: 0;
+	background-color: #787878;
+	overflow: hidden;
+}
+
+body {
+	background-color: gray;
+	width: 600px;
+	height: 1080px;
+}
+
+#helloWorldBox {
+	position: relative;
+	left: 25%;
+	top: 45%;
+	width: 280px;
+	height: 50px;
+	background-color: #067DFF;
+	font-size: 42px;
+}

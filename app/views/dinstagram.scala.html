@@ -1,0 +1,691 @@
+@(appTag: String, appName: String, displayId: String, wsAddress: String, size: String)
+
+@main("Instagram App on UsiDisplay!") {
+
+		@if(size == "small"){
+			<link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/mainSmall.css")">
+		}
+		@if(size == "big"){
+			<link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/mainBig.css")">
+		}
+		@if(size == "fullscreen"){
+			<link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/mainFullscreen.css")">
+		}
+	
+	<div id="logoBox">
+		<div id="logo">@appName</div>
+		<div id="logoTag">#@appTag</div>
+	</div>
+	
+	<div id="pageFrame">
+		<div id="pageBox">
+			<div id="page1" class='page'>
+				<div id="imageNewRibbon">
+					<div id="imageNewRibbonText"> NEW </div>
+				</div>
+			</div>
+			<div id="page2" class='page'></div>
+			<div id="page3" class='page'></div>
+		</div>
+	</div>
+	
+	<div id="hotLogo"> HOT 4</div>
+	<div id="hotFrame"></div>
+	
+	<div id="pageIndicatorBox">
+		<div id="pageIndicatorBoxInner">
+			<div id="pageInd1" class='pageIndicator' onclick="flipPage(null,1)"></div>
+			<div id="pageInd2" class='pageIndicatorOff' onclick="flipPage(null,2)"></div>
+			<div id="pageInd3" class='pageIndicatorOff' onclick="flipPage(null,3)"></div>
+		</div>	
+	</div>
+	
+	<div id="imageGallery">
+		<img id="imageGalleryBox"></img>
+		<div id="imageGallerySBar">
+			<img id="imageGallerySBarHeart"></img>
+			<div id="imageGallerySBarNLikes"></div>
+		</div>
+		<div id="imageGalleryABar">
+			<img id="imageGalleryABarUPic"></img>
+			<div id="imageGalleryABarUName"></div>
+			<div id="imageGalleryABarTime"></div>
+		</div>
+		<div id="imageGalleryX"> X</div>
+		
+	</div>
+	
+	<script type="text/javascript">
+	
+	//TODO add some javaScript/JQuery logic here - controll it through webSocket messages from the server
+	
+	//--- global parameters
+	var pageCurrent = 1;
+	var pageToAddImages = 1;
+	var pages = [ [1,0] , [2,0] , [3,0]]; //[page, number of items[0-16]]
+	
+	var marginTop = 0;
+	var offsetTop = 0;
+	var marginLef = 0;
+	var offsetLef = 0;
+	var pageItemPositions = [ [0+offsetLef,  0+offsetTop],[255+marginLef,  0+offsetTop],[510+marginLef,  0+offsetTop],[765+marginLef,  0+offsetTop],
+	                          [0+offsetLef,235+marginTop],[255+marginLef,235+marginTop],[510+marginLef,235+marginTop],[765+marginLef,235+marginTop],
+	                          [0+offsetLef,470+marginTop],[255+marginLef,470+marginTop],[510+marginLef,470+marginTop],[765+marginLef,470+marginTop],
+	                          [0+offsetLef,705+marginTop],[255+marginLef,705+marginTop],[510+marginLef,705+marginTop],[765+marginLef,705+marginTop]]; //4x4
+	var hotItem = 0;
+	var hotItemPosition = [[0,0],[0,242],[0,484],[0,728]];  
+	
+	var timeOutGallery = null;
+	var clickLike = true;
+	var timeOutClickLike = null;
+	
+	var activity = false;
+	
+	//------------------------------------------------------------------------------
+	//--- animations-------------------------------------------------------------
+	
+	//flip pages
+	setInterval(function() {
+		if(!activity){
+			var effect = Math.ceil(Math.random()*2); /* Pick random number between 1 and 2 */
+			console.log("effect (no activity): "+effect);
+			if(effect == 1){
+				changePage();
+			}
+			if(effect == 2){
+				shuffle();
+			}
+		}
+		activity = false;
+    }, 5000);
+	
+	function changePage(){
+		
+		var randomPage = Math.ceil(Math.random()*3); /* Pick random number between 1 and 3 */
+         
+		if(pageCurrent != randomPage){
+			//$("#pageBox").css("left",((1-page)*1040+5));
+			pageCurrent = randomPage;
+			changePageIndicator(randomPage);
+			$("#pageBox").animate({left: (1-randomPage)*1040}, 4000 );
+		}//if
+		
+	}//changePage
+	
+	function shuffle(){
+		var rImg1 = Math.ceil(Math.random()*16); /* Pick random number between 1 and 16 */
+		var rImg2 = Math.ceil(Math.random()*16); /* Pick random number between 1 and 16 */
+		
+		var page = $("#page"+pageCurrent);
+		
+		var item1 = null;
+		var item2 = null;
+		var c1 = ".it"+(rImg1-1);
+		var c2 = ".it"+(rImg2-1);
+		var c1a = "it"+(rImg1-1);
+		var c2a = "it"+(rImg2-1);
+		
+		
+		item1 = page.find(c1);
+		item2 = page.find(c2);
+		
+		item1.removeClass(c1a).addClass(c2a);
+		item2.removeClass(c2a).addClass(c1a);
+		
+		item1.flip({
+			direction:'lr', // 'tb', 'bt', 'lr', 'rl' (default:'tb')
+			speed: 1000,
+		});
+		
+		item2.flip({
+			direction:'lr', // 'tb', 'bt', 'lr', 'rl' (default:'tb')
+			speed: 1000,
+		});
+		
+	}//shuffle
+	
+	//------------------------------------------------------------------------------
+	//--- adding images-------------------------------------------------------------
+	
+	function addInitImage(response){
+		
+		if(pageToAddImages > pages.length){
+			console.log("igonere | Image: id= "+response.id+" author: "+response.authorFullName)
+		}else{
+			console.log("page: "+pageToAddImages+",item: "+(pages[pageToAddImages-1][1]+1)+" | Image: id= "+response.id+" ,time= "+response.createdTime+" ,author= "+response.authorFullName+" ,url= "+ response.stdImageUrl);
+			
+			var page = "#page"+pageToAddImages;
+			//addImage(response, $(page), pages[pageToAddImages-1][1], pageItemPositions[pages[pageToAddImages-1][1]][1], pageItemPositions[pages[pageToAddImages-1][1]][0]);
+			addImage(response, $(page), pages[pageToAddImages-1][1]);
+			
+			pages[pageToAddImages-1][1] ++;
+			
+			if(pages[pageToAddImages-1][1]>15){ //0...15 (16 images)
+				//change the page, page++
+				pageToAddImages ++;
+			}//if
+		    
+		}//else
+	}//function addInitImage(response)
+	
+	function addNewImage(response){
+		console.log("addNewImage");
+		var previousItem = null;
+		var currentItem = null;
+		
+		for(var p=0; p<pages.length; p++){ //for each page
+			console.log("page: "+(p+1));
+			var page = $("#page"+(p+1));
+			//---slide all images one place right/down, make room for the new image
+			
+			//take first image element as a reference
+			previousItem = page.find(".it0");
+			
+			//add new image to the first position
+			if(currentItem != null){
+				//add image from the previous page
+				page.prepend(currentItem);
+				currentItem.removeClass("it15").addClass("it0");
+				if(pageCurrent == (p+1)){
+					currentItem.show('blind', {}, 2000);
+				}//if
+				currentItem = null;
+			}else{
+				//add new image from response
+				addImage(response, page, 0);
+				currentItem = null;
+				//show new image ribbon
+				$("#imageNewRibbon").show();
+				setTimeout(function(){
+					$("#imageNewRibbon").hide('pulsate', {}, 1000);
+				},10000);
+			}
+			
+			for(var i=1; i<pages[0][1]; i++){ //for each image on the page
+				console.log("   item: "+(i));
+				var fClass = ".it"+i;
+				var rClass = "it"+(i-1);
+				var aClass = "it"+(i);
+				
+				currentItem = page.find(fClass);
+				previousItem.removeClass(rClass).addClass(aClass);
+				
+				if(pageCurrent == (p+1)){
+					previousItem.flip({
+						direction:'lr', // 'tb', 'bt', 'lr', 'rl' (default:'tb')
+						speed: 300,
+					});
+				}//if
+				previousItem = currentItem;	
+			}// for
+			
+			//take last image out and add it to the next page
+			currentItem.remove();
+		
+		}
+		
+		activity = true;
+		
+		//TODO
+		//add new page until maxNumberOfPages
+		
+		
+	}//function addNewImage(response)
+	
+	function addHotImage(response){
+		
+		addImage(response, $("#hotFrame"), hotItem);
+		hotItem += 4;
+		
+	}//function addNewImageHot(response)
+	
+	function updateHotImage(response, position){
+		
+		var hotFrame = $("#hotFrame");
+		
+		if(position == 0){
+			
+			var image = hotFrame.find(".it0");
+			image.flip({
+				direction:'lr', // 'tb', 'bt', 'lr', 'rl' (default:'tb')
+				speed: 300,
+			});
+			
+			addImage(response, hotFrame, 0);
+			
+			image.remove();
+			
+		}else if(position == 1){
+			
+			var image1 = hotFrame.find(".it4");
+			image1.flip({
+				direction:'lr', // 'tb', 'bt', 'lr', 'rl' (default:'tb')
+				speed: 300,
+			});
+			
+			addImage(response, hotFrame, 4);
+			
+			image1.remove();
+			
+		}else if(position == 2){
+			
+			var image2 = hotFrame.find(".it8");
+			//image2.hide( 'blind', {}, 1000);
+			image2.flip({
+				direction:'lr', // 'tb', 'bt', 'lr', 'rl' (default:'tb')
+				speed: 300,
+			});
+			
+			image2.remove();
+			
+			addImage(response, hotFrame, 8);
+			
+			
+		}else if(position == 3){
+			
+			var image3 = hotFrame.find(".it12");
+			//image3.hide( 'blind', {}, 1000);
+			image3.flip({
+				direction:'lr', // 'tb', 'bt', 'lr', 'rl' (default:'tb')
+				speed: 300,
+			});
+			
+			image3.remove();
+			
+			addImage(response, hotFrame, 12);
+			
+			
+		}
+	
+	}//updateHotImage
+		
+	function addImage(response, container, position){
+		
+		//create an image frame
+		var newItem = $("<div id='"+response.id+"' class='item it"+position+"'></div>");
+		newItem.data("id", response.id);
+		newItem.data("url", response.stdImageUrl);
+		newItem.data("createdTime", response.createdTime);
+		newItem.data("authorName", response.authorFullName);
+		newItem.data("authorPic", response.authorPic);
+		newItem.data("nLikes", response.nLikes);
+		
+		//add image to the frame
+		var itemImage = $("<img class='image'></img>");
+		itemImage.attr("src", response.stdImageUrl);
+		newItem.append(itemImage);
+		
+		//add user picture to the newItem
+		var itemUserPic = $("<img class='imageUserPic'></img>");
+		itemUserPic.attr("src", response.authorPic);
+		newItem.append(itemUserPic);
+		
+		//add user name
+		var itemUserName = $("<div class='imageUserName'></div>");
+		itemUserName.text(response.authorFullName);
+		newItem.append(itemUserName);
+		
+		//add heart image
+		var itemHeartImg = $("<img id='heartImg' class='imageHeartImg'></img>");
+		itemHeartImg.attr("src","@routes.Assets.at("images/heart/h_grey.gif")");
+		newItem.append(itemHeartImg);
+		
+		//add number of Likes
+		var itemNLikes = $("<div id='nLikes' class='imageNLikes'></div>");
+		itemNLikes.text(response.nLikes);
+		newItem.append(itemNLikes);
+		
+		//position the frame on the page
+		//newItem.css({'top':top, 'left':left});
+				
+		//mouse events
+		newItem.click(function(){ // Open Image Gallery
+			//console.log("image click id:"+newItem.data("itemId"));
+			showGallery(response.id);
+			
+			//--------------
+			//addNewImage("ok");
+			//--------------
+			
+		});
+		
+		newItem.mouseup(function(){
+			return false;
+		});
+		
+		//add the frame to the page
+		if(position == 0){
+			container.prepend(newItem);
+		}else{
+			container.append(newItem);
+		}
+		
+	}//function addImage(response, container)
+	
+	
+	//------------------------------------------------------------------------------
+	//--- disable item selection----------------------------------------------------
+	$("#logoBox").mousedown(function(){
+		return false;
+	});
+	
+	$("#hotFrame").mousedown(function(){
+		return false;
+	});
+	
+	$("#hotLogo").mousedown(function(){
+		return false;
+	});
+	
+	$("#imageGallery").mousedown(function(){
+		return false;
+	});
+	
+	$("#imageGalleryBox").mousedown(function(){
+		return false;
+	});
+	
+	$("#imageGallerySBar").mousedown(function(){
+		return false;
+	});
+	$("#pageIndicatorBox").mousedown(function(){
+		return false;
+	});
+	
+	//------------------------------------------------------------------------------
+	//--- page scroll effect--------------------------------------------------------
+	
+	$("#pageFrame").mousedown(function(e){
+		//console.log("mousedown event");
+		//console.log(window.event.pageX);
+		
+		var initX = window.event.pageX;
+		//console.log("   initX:"+initX);
+		
+		this.onmousemove=function(){
+			
+			var currentX = window.event.pageX;
+			var moveX = currentX - initX;
+			
+			if(moveX < 400 && moveX >-400){
+				$("#pageBox").css("left",((1-pageCurrent)*1040)+moveX);
+				//console.log(moveX);
+			}else if(moveX < -401 && pageCurrent < 3){
+				console.log("position: "+ $('#pageBox').position().left );
+				flipPage(this,pageCurrent+1);
+				//flipPage1(this,pageCurrent+1,$('#pageBox').position().left);
+			}else if(moveX > 401 && pageCurrent > 1){
+				flipPage(this,pageCurrent-1);			
+			}
+			activity = true;
+		};
+		activity = true;
+		return false;
+	});
+	
+	$("#pageFrame").mouseup(function(e){
+		//console.log("mouseup event");
+		centerPage(this,pageCurrent);
+	});
+	
+	$("#pageFrame").mouseout(function(e){
+		//console.log("mouseout event");
+		centerPage(this,pageCurrent);
+	});
+	
+	function centerPage(frame,page){
+		if(frame != null){
+			frame.onmousemove = null;
+		}
+		
+		$("#pageBox").css("left",((1-page)*1040+5));
+		
+	}
+	
+	function flipPage(frame,page){
+		if(frame != null){
+			frame.onmousemove = null;
+		}
+		if(pageCurrent != page){
+			$("#pageBox").css("left",((1-page)*1040+5));
+			pageCurrent = page;
+			changePageIndicator(page);
+			//$("#pageBox").animate({left: (1-page)*1040}, 6000 );
+		}
+	}
+	
+	function flipPage1(frame,page,x){
+		if(frame != null){
+			frame.onmousemove = null;
+		}
+		
+		if(pageCurrent != page){
+			pageCurrent = page;
+			changePageIndicator(page);
+			var move = "-="+ Math.abs(((1-page)*1040-x)) +"px";
+			console.log("move: " + move);
+			$("#pageBox").css("left",((1-page)*1040-x-100));
+			$("#pageBox").stop().animate({left: move}, 3000 );
+		}
+	}
+	
+	function changePageIndicator(page){
+		var page1 = "#pageInd" + 1;
+		var page2 = "#pageInd" + 2;
+		var page3 = "#pageInd" + 3;
+		
+		if(page == 1){
+			$(page1).removeClass("pageIndicatorOff");
+			$(page1).addClass("pageIndicator");
+			$(page2).removeClass("pageIndicator");
+			$(page2).addClass("pageIndicatorOff");
+			$(page3).removeClass("pageIndicator");
+			$(page3).addClass("pageIndicatorOff");
+		}
+		if(page == 2){
+			$(page1).removeClass("pageIndicator");
+			$(page1).addClass("pageIndicatorOff");
+			$(page2).removeClass("pageIndicatorOff");
+			$(page2).addClass("pageIndicator");
+			$(page3).removeClass("pageIndicator");
+			$(page3).addClass("pageIndicatorOff");
+		}
+		if(page == 3){
+			$(page1).removeClass("pageIndicator");
+			$(page1).addClass("pageIndicatorOff");
+			$(page2).removeClass("pageIndicator");
+			$(page2).addClass("pageIndicatorOff");
+			$(page3).removeClass("pageIndicatorOff");
+			$(page3).addClass("pageIndicator");	
+		}
+	}
+	//------------------------------------------------------------------------------
+	//----image gallery-------------------------------------------------------------
+	
+	function showGallery(id){
+		
+		var imageId = "#"+id;
+		console.log("image galery: "+$(imageId).data("id"));
+		
+		$('#imageGallery').show('blind','fast');
+		$('#imageGalleryBox').attr("src", $(imageId).data("url"));
+		
+		$('#imageGalleryBox').data("id", $(imageId).data("id"));
+		
+		
+		$('#imageGalleryABarUPic').attr("src", $(imageId).data("authorPic"));
+		$('#imageGalleryABarUName').text($(imageId).data("authorName"));
+		$('#imageGalleryABarTime').text(jQuery.timeago(new Date(new Number($(imageId).data("createdTime"))*1000)));
+		
+		$('#imageGallerySBarHeart').attr("src", "@routes.Assets.at("images/heart/h_grey.gif")");
+		$('#imageGallerySBarNLikes').text($(imageId).data("nLikes"));
+		
+		//timeOutGallery = setTimeout(function(){closeGallery();},25000);
+	}
+	
+	$('#imageGallerySBarHeart').click(function(){	//Likes +1
+		
+		if(clickLike == true){
+			//get the image id
+			var imageId = "#" + $('#imageGalleryBox').data("id");
+			//update the number of likes for that particular image (imageID), likes+1
+			$(imageId).data("nLikes", $(imageId).data("nLikes")+1);
+			
+			//update the text filed - the number of likes
+			//on the galery page
+			$('#imageGallerySBarNLikes').text($(imageId).data("nLikes"));	
+			$('#imageGallerySBarHeart').attr("src", "@routes.Assets.at("images/heart/h_red.gif")");
+			//on the regular page
+			$(imageId).find('#nLikes').text($(imageId).data("nLikes"));
+			$(imageId).find('#heartImg').attr("src", "@routes.Assets.at("images/heart/h_red.gif")");
+			setTimeout(function(){$(imageId).find('#heartImg').attr("src", "@routes.Assets.at("images/heart/h_grey.gif")");},5000);
+			//on the hot page
+			$("#hotFrame").find(imageId).find('#nLikes').text($(imageId).data("nLikes"));
+			$("#hotFrame").find(imageId).find('#heartImg').attr("src", "@routes.Assets.at("images/heart/h_red.gif")");
+			setTimeout(function(){$("#hotFrame").find(imageId).find('#heartImg').attr("src", "@routes.Assets.at("images/heart/h_grey.gif")");},5000);
+			
+			//send update to the server, update the db, send update message to other clients
+			console.log("ToServer: send likePlus event "); 
+			var likePlus = JSON.stringify({
+				"kind":"likePlus",
+				"displayID": @displayId,
+				"imageId": $('#imageGalleryBox').data("id")
+			});
+			websocket.send(likePlus);
+			
+			//disable likes for 10s or until the gallery is closed
+			clickLike = false;
+			timeOutClickLike = setTimeout(function(){
+				// enable clicks again
+				clickLike = true; 
+				// change the heart icon to gray
+				$('#imageGallerySBarHeart').attr("src", "@routes.Assets.at("images/heart/h_grey.gif")");;
+			},5000);
+		}
+		activity = true;
+	});
+	
+	$("#imageGalleryX").click(function(){
+		clearTimeout(timeOutGallery);
+		clearTimeout(timeOutClickLike); clickLike = true;
+		closeGallery();
+		activity = true;
+	});
+	
+	function closeGallery(){
+		$('#imageGallery').css('display','none');
+		activity = true;
+	}//closeGallery
+	
+	function updateNumberOfLikes(response){
+		console.log("update likes for image: "+response.imageId);
+		
+		//form the image id
+		var imageId = "#" + response.imageId;
+		
+		//update the number of likes for that particular image (imageID), likes+1
+		$(imageId).data("nLikes", $(imageId).data("nLikes")+1);
+		
+		//on the regular page
+		$(imageId).find('#nLikes').text($(imageId).data("nLikes"));
+		$(imageId).find('#heartImg').attr("src", "@routes.Assets.at("images/heart/h_red.gif")");
+		setTimeout(function(){$(imageId).find('#heartImg').attr("src", "@routes.Assets.at("images/heart/h_grey.gif")");},5000);
+		//on the hot page
+		$("#hotFrame").find(imageId).find('#nLikes').text($(imageId).data("nLikes"));
+		$("#hotFrame").find(imageId).find('#heartImg').attr("src", "@routes.Assets.at("images/heart/h_red.gif")");
+		setTimeout(function(){$("#hotFrame").find(imageId).find('#heartImg').attr("src", "@routes.Assets.at("images/heart/h_grey.gif")");},5000);
+		
+		
+	}//updateNumberOfLikes
+	
+	
+	//------------------------------------------------------------------------------
+	//---- WS ----------------------------------------------------------------------
+	
+	var WS = WebSocket;
+	var wsUri = "@wsAddress";
+	websocket = new WS(wsUri); 
+	
+	console.log("display id: "+@displayId+" ,size: "+"@size");
+	
+	websocket.onopen = function(evt) { 
+		console.log("CONNECTED"); 
+		var hi = JSON.stringify
+		({
+			"kind":"appReady",
+			"displayID": @displayId,
+			"size": "@size"
+		});
+		websocket.send(hi);
+	}; //websocket.onopen
+
+	websocket.onclose = function(evt) { 
+		console.log("DISCONNECTED");
+		var bye = JSON.stringify
+		({
+			"kind":"appClose",
+			"displayID": @displayId,
+			"size": "@size"
+		});
+		websocket.send(bye);
+	}; //websocket.onclose
+
+	websocket.onmessage = function(evt) {
+		var response = jQuery.parseJSON(evt.data);
+		
+		if(response.kind == "request"){
+			//TODO - do something here when a message from the app server arrives
+		}//if
+		
+		//Hello World message sent from the app server
+		if(response.kind == "hello"){
+			//$('#helloWorldBox').text(response.text);
+		}//if
+		
+		//when a new image is received
+		if(response.kind == "newImage"){
+			addNewImage(response);
+		}
+		
+		if(response.kind == "initImage"){
+			addInitImage(response);
+		}
+		
+		if(response.kind == "hotImage"){
+			addHotImage(response);
+		}
+		
+		if(response.kind == "hotImageReordered0"){
+			console.log("reorder the hot image area 0!");
+			updateHotImage(response, 0);
+		}
+		if(response.kind == "hotImageReordered1"){
+			console.log("reorder the hot image area 1!");
+			updateHotImage(response, 1);
+		}
+		if(response.kind == "hotImageReordered2"){
+			console.log("reorder the hot image area 2!");
+			updateHotImage(response, 2);
+		}
+		if(response.kind == "hotImageReordered3"){
+			console.log("reorder the hot image area 3!");
+			updateHotImage(response, 3);
+		}
+		
+		if(response.kind == "likeUpdate"){
+			updateNumberOfLikes(response);
+		}
+		
+		//TODO - add other messages as needed
+			
+	}; //websocket.onmessage
+
+	websocket.onerror = function(evt) { 
+		console.log(evt.data); 
+	}; //websocket.onerror
+	
+	//---- WS
+	
+	</script>	
+
+}

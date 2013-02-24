@@ -1,0 +1,13 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                           controllers.DInstagramController.index(id: String ?= null, size: String ?= null)
+GET     /dinstagram                controllers.DInstagramController.index(id: String ?= null, size: String ?= null)
+
+# Sockets
+GET		/dinstagram/socket			controllers.DInstagramController.webSocket
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)
