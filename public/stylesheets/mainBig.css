@@ -13,14 +13,15 @@ html, body {
 }
 
 body {
-	background-color: black;
+	background-color: #323131;
 	width: 1320px;
 	height: 1080px;
+	cursor: none;
 }
 
 /* logo */
 #logoBox {
-	width: 100%;
+	width: 1040px;
 	height: 100px;
 }
 
@@ -46,6 +47,9 @@ body {
 	height: 930px;
 	width: 1050px;
 	overflow: hidden;
+	left: 13px;
+	top: 1px;
+	position: relative;
 	
 }
 
@@ -101,10 +105,10 @@ body {
 
 #hotLogo{
 	position: absolute;
-	height: 50px;
-	top: 40px;
-	width: 200px;
-	left: 1130px;
+	height: 100px;
+	top: 0px;
+	width: 280px;
+	left: 1044px;
 	font-family:instagram;
 	color: #379;
 	font-size: 50px;
@@ -112,15 +116,25 @@ body {
 
 #hotFrame{
 	position: absolute;
-	height: 953px;
+	height: 931px;
 	width: 270px;
-	top: 101px;
-	left: 1042px;
+	top: 123px;
+	left: 1056px;
 	overflow: hidden;
-	border-left:solid;
+	z-index: 2;
+/*	border-left:solid;
 	border-left-color:#379;
-	border-left-width: 12px;
-	
+	border-left-width: 12px;*/
+}
+
+#hotFrameBg{
+	position: absolute;
+	top: 93px;
+	left: 1043px;
+	width: 276px;
+	height: 986px;
+	background-color: #D3D3D3;
+	z-index: 1;
 }
 
 /* items/images */
@@ -272,6 +286,7 @@ body {
 	display: none;	
 	border: solid;
 	border-radius: 10px;
+	z-index: 3;
 }
 
 #imageGalleryBox{
@@ -288,8 +303,8 @@ body {
 	position: absolute;
 	width: 70px;
 	height: 70px;
-	top: -5px;
-	left: 1053px;
+	top: -3px;
+	left: 1057px;
 	border: solid;
 	border-radius: 10px;
 	font-family:instagram;

@@ -13,8 +13,9 @@
 		}
 	
 	<div id="logoBox">
-		<div id="logo">@appName</div>
-		<div id="logoTag">#@appTag</div>
+		<!-- <div id="logo">@appName</div> -->
+		<!-- <div id="logoTag">#@appTag</div> -->
+		<img src="@routes.Assets.at("images/bg/instamoment.jpg")"></img>
 	</div>
 	
 	<div id="pageFrame">
@@ -29,8 +30,11 @@
 		</div>
 	</div>
 	
-	<div id="hotLogo"> HOT 4</div>
+	<div id="hotLogo">
+		<img src="@routes.Assets.at("images/bg/ho4.jpg")"></img>
+	</div>
 	<div id="hotFrame"></div>
+	<div id="hotFrameBg"></div>
 	
 	<div id="pageIndicatorBox">
 		<div id="pageIndicatorBoxInner">
@@ -79,7 +83,7 @@
 	var clickLike = true;
 	var timeOutClickLike = null;
 	
-	var activity = false;
+var activity = false;
 	
 	//------------------------------------------------------------------------------
 	//--- animations-------------------------------------------------------------
@@ -97,7 +101,7 @@
 			}
 		}
 		activity = false;
-    }, 5000);
+    }, 30000);
 	
 	function changePage(){
 		
@@ -174,7 +178,7 @@
 		var currentItem = null;
 		
 		for(var p=0; p<pages.length; p++){ //for each page
-			console.log("page: "+(p+1));
+			//console.log("page: "+(p+1));
 			var page = $("#page"+(p+1));
 			//---slide all images one place right/down, make room for the new image
 			
@@ -195,14 +199,14 @@
 				addImage(response, page, 0);
 				currentItem = null;
 				//show new image ribbon
-				$("#imageNewRibbon").show();
+				$("#imageNewRibbon").show('pulsate', {}, 5000);
 				setTimeout(function(){
-					$("#imageNewRibbon").hide('pulsate', {}, 1000);
+					$("#imageNewRibbon").hide('pulsate', {}, 5000);
 				},10000);
 			}
 			
 			for(var i=1; i<pages[0][1]; i++){ //for each image on the page
-				console.log("   item: "+(i));
+				//console.log("   item: "+(i));
 				var fClass = ".it"+i;
 				var rClass = "it"+(i-1);
 				var aClass = "it"+(i);
@@ -228,6 +232,13 @@
 		
 		//TODO
 		//add new page until maxNumberOfPages
+		
+		//go to first page, where the new image has been added
+		if(pageCurrent != 1){
+			pageCurrent = 1;
+			changePageIndicator(1);
+			$("#pageBox").animate({left: 0}, 4000 );
+		}//if
 		
 		
 	}//function addNewImage(response)
@@ -296,7 +307,10 @@
 			
 			
 		}
-	
+		
+		
+		activity = true;
+		
 	}//updateHotImage
 		
 	function addImage(response, container, position){
@@ -423,15 +437,23 @@
 		return false;
 	});
 	
-	$("#pageFrame").mouseup(function(e){
-		//console.log("mouseup event");
-		centerPage(this,pageCurrent);
-	});
+ 	$("#pageFrame").mouseup(function(e){
+ 		//console.log("mouseup event");
+ 		centerPage(this,pageCurrent);
+ 		activity = true;
+ 	});
 	
 	$("#pageFrame").mouseout(function(e){
 		//console.log("mouseout event");
 		centerPage(this,pageCurrent);
+		activity = true;
 	});
+	
+	/* function pageFrameOnDragEnd(){
+		console.log("mouseout ondragend");
+		centerPage(this,pageCurrent);
+		activity = true;
+	}  */
 	
 	function centerPage(frame,page){
 		if(frame != null){
@@ -452,6 +474,7 @@
 			changePageIndicator(page);
 			//$("#pageBox").animate({left: (1-page)*1040}, 6000 );
 		}
+		activity = true;
 	}
 	
 	function flipPage1(frame,page,x){
@@ -520,7 +543,7 @@
 		$('#imageGallerySBarHeart').attr("src", "@routes.Assets.at("images/heart/h_grey.gif")");
 		$('#imageGallerySBarNLikes').text($(imageId).data("nLikes"));
 		
-		//timeOutGallery = setTimeout(function(){closeGallery();},25000);
+		timeOutGallery = setTimeout(function(){closeGallery();},25000);
 	}
 	
 	$('#imageGallerySBarHeart').click(function(){	//Likes +1

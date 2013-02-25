@@ -65,7 +65,7 @@ public class DInstagramController extends Controller {
 	//!!!changing the tag will delete all images (with old tag) from the db
 	public static String appDisplayNameTag = "orientaTI13";
 	//public static String wsAddress = "ws://pdnet.inf.unisi.ch:7003/dinstagram/socket";
-	public static String wsAddress = "ws://localhost:7002/dinstagram/socket";
+	public static String wsAddress = "ws://localhost:7003/dinstagram/socket";
 	
 	static int maxNumberOfImagesInst = 50;		//max number of instagram images to send to clients
 	static int maxNumberOfImagesLoca = 30;		//max number of local images to send to clients
@@ -74,7 +74,7 @@ public class DInstagramController extends Controller {
 	
 	static List<MImages> hotImages = null;
 	
-	static String urlPath = "http://pdnet.inf.unisi.ch/devel/public/images/";
+	static String urlPath = "http://pdnet.inf.unisi.ch/dphotobooth/images/";
 	//-----------
 	
 	//display size can be: small(600x1080), big(1320x1080), fullscreen(1920x1080)
@@ -848,7 +848,7 @@ public class DInstagramController extends Controller {
 		initHotImages();
 	   	
 		//start service/scheduler that checks for new images
-		//startTagScheduler();
+		startTagScheduler();
 		
 	}//INITInstagram()
 		
@@ -894,7 +894,7 @@ public class DInstagramController extends Controller {
 									
 									
 								}//if
-								AppLogger.addNew(new AppLogger(appName, "displayNew", "data", "", "null"));
+								AppLogger.addNew(new AppLogger(appName, "displayNew", "data", new Date().toString(), event.get("displayID").asText()));
 								
 								//initialize instagram, later move this to the app global
 								//DInstagramController.initInstagram();
@@ -911,6 +911,7 @@ public class DInstagramController extends Controller {
 						if(messageKind.equals("appClose")){
 							//TODO add to app logger
 							Logger.info(appName+".webSocket(): appClose - displayID="+event.get("displayID")+" size="+event.get("size"));
+							AppLogger.addNew(new AppLogger(appName, "displayClose", new Date().toString(),"data", event.get("displayID").asText()));
 						}
 						
 						//likePlus event form the client, update image.numberOfLikesLocal
@@ -919,6 +920,7 @@ public class DInstagramController extends Controller {
 							Logger.info(appName+".webSocket(): likePlus event | displayID="+event.get("displayID")+" imageId: "+event.get("imageId").asText());
 							//update the db
 							DInstagramController.updateLikesInDbLocal(event.get("imageId").asText(), event.get("displayID").asText());
+							AppLogger.addNew(new AppLogger(appName, "likePlus", new Date().toString(), event.get("imageId").asText(), event.get("displayID").asText()));
 						}
 						
 						//TODO add more messages from clients such as appReady or appClose as needed
