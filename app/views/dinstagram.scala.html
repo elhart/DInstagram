@@ -324,6 +324,11 @@ var activity = false;
 		newItem.data("authorPic", response.authorPic);
 		newItem.data("nLikes", response.nLikes);
 		
+		//add X admin button to the frame
+		var itemXButton = $("<div id='xButton'></div>");
+		itemXButton.text("X");
+		newItem.append(itemXButton);
+		
 		//add image to the frame
 		var itemImage = $("<img class='image'></img>");
 		itemImage.attr("src", response.stdImageUrl);

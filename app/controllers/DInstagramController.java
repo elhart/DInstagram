@@ -65,7 +65,7 @@ public class DInstagramController extends Controller {
 	//!!!changing the tag will delete all images (with old tag) from the db
 	public static String appDisplayNameTag = "orientaTI13";
 	//public static String wsAddress = "ws://pdnet.inf.unisi.ch:7003/dinstagram/socket";
-	public static String wsAddress = "ws://localhost:7003/dinstagram/socket";
+	public static String wsAddress = "ws://localhost:7002/dinstagram/socket";
 	
 	static int maxNumberOfImagesInst = 50;		//max number of instagram images to send to clients
 	static int maxNumberOfImagesLoca = 30;		//max number of local images to send to clients
@@ -265,7 +265,7 @@ public class DInstagramController extends Controller {
 			
 			Logger.info("----Tag.scheduler(): check for new images");
 			tagWatchDog(instagram);
-			localWatchDog();
+			//localWatchDog();
 			Logger.info("-----------------------------------------");
 		
 		}//run

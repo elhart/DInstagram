@@ -16,7 +16,6 @@ body {
 	background-color: #323131;
 	width: 1320px;
 	height: 1080px;
-	cursor: none;
 }
 
 /* logo */
@@ -297,6 +296,21 @@ body {
 	top: 174px;
 	float:left;
 	border: solid;
+}
+
+#xButton{
+	position: absolute;
+	width: 80px;
+	height: 80px;
+	top: 0px;
+	left: 0px;
+	border: solid;
+	border-radius: 40px;
+	font-family:instagram;
+	color: black;
+	font-size: 75px;
+	text-align: center;
+	background-color: red;
 }
 
 #imageGalleryX{
