@@ -4,7 +4,7 @@
 
 # Home page
 GET     /                           controllers.DInstagramController.index(id: String ?= null, size: String ?= null)
-GET     /dinstagram                controllers.DInstagramController.index(id: String ?= null, size: String ?= null)
+GET     /dinstagram/                controllers.DInstagramController.index(id: String ?= null, size: String ?= null)
 
 # Sockets
 GET		/dinstagram/socket			controllers.DInstagramController.webSocket
